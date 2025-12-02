@@ -23,31 +23,35 @@ jobs:
     # ⬇⬇⬇ ADD THIS LINE TO USE YOUR EC2 SELF-HOSTED RUNNER
     runs-on: [self-hosted, linux, ec2]   # <-- match your runner labels
 
-   # uses: voting/.github/.github/workflows/reusable-docker-build.yaml@main
-
     permissions:
       contents: read
       packages: write      # needed to push docker image to ghcr.io
       pull-requests: write # needed for PR comments
-    
-    secrets:
-      dockerhub-username: ${{ secrets.DOCKERHUB_USERNAME }}
-      dockerhub-token: ${{ secrets.DOCKERHUB_TOKEN }}
 
-    with:
-      dockerhub-enable: true
-      ghcr-enable: true
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
 
-      image-names: |
-        ghcr.io/voting/example-voting-app-result
-        voting/examplevotingapp_result
+      - name: Call reusable workflow
+        uses: voting/.github/.github/workflows/reusable-docker-build.yaml@main
+        with:
+          dockerhub-enable: true
+          ghcr-enable: true
 
-      tag-rules: |
-        type=raw,value=latest,enable=${{ endsWith(github.ref, github.event.repository.default_branch) }}
-        type=raw,value=before,enable=${{ endsWith(github.ref, github.event.repository.default_branch) }}
-        type=raw,value=after,enable=${{ endsWith(github.ref, github.event.repository.default_branch) }}
-        type=ref,event=pr
+          image-names: |
+            ghcr.io/voting/example-voting-app-result
+            voting/examplevotingapp_result
 
-      context: result
+          tag-rules: |
+            type=raw,value=latest,enable=${{ endsWith(github.ref, github.event.repository.default_branch) }}
+            type=raw,value=before,enable=${{ endsWith(github.ref, github.event.repository.default_branch) }}
+            type=raw,value=after,enable=${{ endsWith(github.ref, github.event.repository.default_branch) }}
+            type=ref,event=pr
 
-      platforms: linux/amd64,linux/arm64,linux/arm/v7
+          context: result
+
+          platforms: linux/amd64,linux/arm64,linux/arm/v7
+
+        secrets:
+          dockerhub-username: ${{ secrets.DOCKERHUB_USERNAME }}
+          dockerhub-token: ${{ secrets.DOCKERHUB_TOKEN }}
