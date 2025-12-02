@@ -1,5 +1,5 @@
 name: Build Result
-# template source: https://github.com/dockersamples/.github/blob/main/templates/call-docker-build.yaml
+# template source: https://github.com/voting/.github/blob/main/templates/call-docker-build.yaml
 
 on:
   push:
@@ -23,7 +23,7 @@ jobs:
     # ⬇⬇⬇ ADD THIS LINE TO USE YOUR EC2 SELF-HOSTED RUNNER
     runs-on: [self-hosted, linux, ec2]   # <-- match your runner labels
 
-    uses: dockersamples/.github/.github/workflows/reusable-docker-build.yaml@main
+    uses: voting/.github/.github/workflows/reusable-docker-build.yaml@main
 
     permissions:
       contents: read
@@ -39,8 +39,8 @@ jobs:
       ghcr-enable: true
 
       image-names: |
-        ghcr.io/dockersamples/example-voting-app-result
-        dockersamples/examplevotingapp_result
+        ghcr.io/voting/example-voting-app-result
+        voting/examplevotingapp_result
 
       tag-rules: |
         type=raw,value=latest,enable=${{ endsWith(github.ref, github.event.repository.default_branch) }}
