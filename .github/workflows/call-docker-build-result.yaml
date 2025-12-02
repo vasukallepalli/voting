@@ -23,7 +23,7 @@ jobs:
     # ⬇⬇⬇ ADD THIS LINE TO USE YOUR EC2 SELF-HOSTED RUNNER
     runs-on: [self-hosted, linux, ec2]   # <-- match your runner labels
 
-    uses: voting/.github/.github/workflows/reusable-docker-build.yaml@main
+   # uses: voting/.github/.github/workflows/reusable-docker-build.yaml@main
 
     permissions:
       contents: read
