@@ -17,39 +17,36 @@ on:
 
 jobs:
   call-docker-build:
-
     name: Result Call Docker Build
 
-    runs-on: [self-hosted, linux, ec2]   # <-- match your runner labels
+    # Use your EC2 self-hosted runner
+    runs-on: [self-hosted, linux, ec2]
 
     permissions:
       contents: read
-      packages: write      # needed to push docker image to ghcr.io
-      pull-requests: write # needed for PR comments
+      packages: write      # Needed to push Docker image to ghcr.io
+      pull-requests: write # Needed for PR comments
 
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
+    # Reference the reusable workflow at the top level
+    uses: voting/.github/.github/workflows/reusable-docker-build.yaml@main
+    with:
+      dockerhub-enable: true
+      ghcr-enable: true
 
-      - name: Call reusable workflow
-        uses: voting/.github/.github/workflows/reusable-docker-build.yaml@main
-        with:
-          dockerhub-enable: true
-          ghcr-enable: true
+      image-names: |
+        ghcr.io/voting/example-voting-app-result
+        voting/examplevotingapp_result
 
-          image-names: |
-            ghcr.io/voting/example-voting-app-result
-            voting/examplevotingapp_result
+      tag-rules: |
+        type=raw,value=latest,enable=${{ endsWith(github.ref, github.event.repository.default_branch) }}
+        type=raw,value=before,enable=${{ endsWith(github.ref, github.event.repository.default_branch) }}
+        type=raw,value=after,enable=${{ endsWith(github.ref, github.event.repository.default_branch) }}
+        type=ref,event=pr
 
-          tag-rules: |
-            type=raw,value=latest,enable=${{ endsWith(github.ref, github.event.repository.default_branch) }}
-            type=raw,value=before,enable=${{ endsWith(github.ref, github.event.repository.default_branch) }}
-            type=raw,value=after,enable=${{ endsWith(github.ref, github.event.repository.default_branch) }}
-            type=ref,event=pr
+      context: result
 
-          context: result
+      platforms: linux/amd64,linux/arm64,linux/arm/v7
 
-          platforms: linux/amd64,linux/arm64,linux/arm/v7
-
-          dockerhub-username: ${{ secrets.DOCKERHUB_USERNAME }}
-          dockerhub-token: ${{ secrets.DOCKERHUB_TOKEN }}
+    secrets:
+      dockerhub-username: ${{ secrets.DOCKERHUB_USERNAME }}
+      dockerhub-token: ${{ secrets.DOCKERHUB_TOKEN }}
